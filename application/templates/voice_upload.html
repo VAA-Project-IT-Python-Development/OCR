@@ -4,36 +4,165 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{{ title }}</title>
+    <style>
+      body {
+        font-family: "Roboto", sans-serif;
+        background-color: #f0f2f5;
+        margin: 0;
+        height: 100vh;
+        overflow: hidden;
+        position: relative;
+      }
+
+      canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: -1;
+        pointer-events: none;
+        display: block;
+        width: 100vw;
+        height: 100vh;
+      }
+
+      .container {
+        position: relative;
+        max-width: 600px;
+        margin: auto;
+        padding: 2rem;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        box-shadow: 0 20px 30px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        transform: perspective(1000px);
+        transform-style: preserve-3d;
+        transition: transform 0.5s;
+      }
+
+      .container:hover {
+        transform: rotateY(5deg);
+      }
+
+      h1 {
+        color: #00796b;
+        margin-bottom: 1.5rem;
+        text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .btn {
+        padding: 10px 20px;
+        background-color: #00796b;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.3s;
+      }
+
+      .btn:hover {
+        background-color: #005f51;
+        transform: translateY(-2px);
+      }
+
+      #status {
+        margin-top: 1rem;
+        font-size: 1.2rem;
+        color: #555;
+      }
+
+      .highlight {
+        font-weight: bold;
+        color: #00796b;
+        text-align: center;
+      }
+    </style>
     <script>
       function startListening() {
-        // Cập nhật trạng thái khi bắt đầu nhận diện giọng nói
         document.getElementById("status").textContent = "Đang nghe bạn nói...";
         document.getElementById("status").style.color = "green"; // Đổi màu chữ thành xanh
       }
     </script>
   </head>
   <body>
+    <canvas id="snowfall"></canvas>
+
     {% extends "layout.html" %} {% block content %}
     <div class="container">
       <h1>{{ title }}</h1>
       <form action="/voice_upload" method="POST">
         <div class="form-group">
-          <p>
+          <p class="highlight">
             Nhấn nút dưới đây để bắt đầu nhận diện giọng nói (lưu ý cho phép sử
             dụng microphone)
           </p>
-          <button
-            type="submit"
-            class="btn btn-primary"
-            onclick="startListening()"
-          >
+          <button type="submit" class="btn" onclick="startListening()">
             Bắt đầu nhận diện giọng nói
           </button>
         </div>
       </form>
-      <!-- Hiển thị trạng thái khi nhận diện giọng nói -->
       <p id="status"></p>
     </div>
     {% endblock %}
+
+    <script>
+      const canvas = document.getElementById("snowfall");
+      const ctx = canvas.getContext("2d");
+
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const snowflakes = [];
+      const numSnowflakes = 200;
+
+      class Snowflake {
+        constructor(x, y) {
+          this.x = x;
+          this.y = y;
+          this.size = Math.random() * 5 + 2;
+          this.speed = Math.random() * 1.5 + 0.5;
+          this.opacity = Math.random() * 0.5 + 0.3;
+        }
+
+        update() {
+          this.y += this.speed;
+          if (this.y > canvas.height) {
+            this.y = -this.size;
+            this.x = Math.random() * canvas.width;
+          }
+        }
+
+        draw() {
+          ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      for (let i = 0; i < numSnowflakes; i++) {
+        snowflakes.push(
+          new Snowflake(
+            Math.random() * canvas.width,
+            Math.random() * canvas.height
+          )
+        );
+      }
+
+      function animateSnowfall() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        snowflakes.forEach((snowflake) => {
+          snowflake.update();
+          snowflake.draw();
+        });
+        requestAnimationFrame(animateSnowfall);
+      }
+
+      animateSnowfall();
+    </script>
   </body>
 </html>

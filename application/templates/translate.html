@@ -3,184 +3,210 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Translations Data</title>
-
-    <!-- Bootstrap CSS -->
+    <title>{{ title }}</title>
     <link
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
       rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
     />
-
-    <!-- Google Fonts -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
-      rel="stylesheet"
-    />
-
-    <!-- Custom CSS -->
     <style>
       body {
-        font-family: "Poppins", sans-serif;
-        background: linear-gradient(135deg, #a8edea, #fed6e3);
-        perspective: 1000px; /* 3D perspective */
+        font-family: "Roboto", sans-serif;
+        background-color: #f0f2f5;
+        position: relative;
+        overflow-x: hidden;
+        min-height: 100vh;
+        margin: 0;
       }
 
-      .table-container {
-        background-color: #fff;
-        border-radius: 15px;
-        box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
-        padding: 20px;
-        margin-top: 50px;
-        width: 100%;
-        max-width: 900px;
-        margin-left: auto;
-        margin-right: auto;
-        transition: box-shadow 0.5s ease; /* Animation for shadow */
+      canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: -1;
+        pointer-events: none;
+        display: block;
+        width: 100vw;
+        height: 100vh;
       }
 
-      /* Remove 3D rotation effect on hover */
-      .table-container:hover {
-        box-shadow: 0px 20px 30px rgba(0, 0, 0, 0.15); /* Add larger shadow on hover */
+      .container {
+        position: relative;
+        padding: 2rem;
+        max-width: 800px;
+        margin: auto;
       }
 
-      h3 {
+      h1 {
         text-align: center;
-        font-weight: bold;
-        color: #333;
-        margin-bottom: 20px;
+        margin-bottom: 2rem;
+        color: #343a40;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
       }
 
-      table {
-        width: 100%;
-        text-align: center;
-        border-collapse: collapse;
-        overflow: hidden;
-      }
-
-      th {
-        background-color: #17a2b8;
-        color: white;
-        font-weight: bold;
-        padding: 10px;
+      .translation-item {
+        background: white;
         border-radius: 10px;
+        padding: 1.5rem;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1.5rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
       }
 
-      td {
-        padding: 15px;
-        font-size: 16px;
-        color: #495057;
-        border-bottom: 1px solid #dee2e6;
-        transition: transform 0.3s ease;
+      .translation-item:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
       }
 
-      td:hover {
-        transform: scale(
-          1.05
-        ); /* Slight hover effect for better user interaction */
-      }
-
-      .audio-btn {
-        background: none;
-        border: none;
-        color: #17a2b8;
-        font-size: 20px;
-        cursor: pointer;
-        outline: none;
-      }
-
-      .audio-btn:hover {
-        color: #138496;
-      }
-
-      .audio-icon {
-        font-size: 24px;
-      }
-
-      .no-data {
+      .translation-header {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #00796b;
+        margin-bottom: 1rem;
         text-align: center;
-        font-size: 18px;
-        color: #888;
-        padding: 20px;
       }
 
-      /* Floating and Glowing Button Animation */
-      .btn-audio {
-        display: inline-block;
-        background-color: #17a2b8;
-        border-radius: 50%;
-        width: 60px;
-        height: 60px;
+      .translation-content {
+        font-size: 1rem;
+        color: #555;
+        margin-bottom: 1rem;
+        text-align: center;
+      }
+
+      .audio-container {
         display: flex;
         justify-content: center;
         align-items: center;
-        color: white;
-        box-shadow: 0px 0px 10px rgba(23, 162, 184, 0.8);
-        animation: floating 3s ease-in-out infinite;
-        transition: box-shadow 0.3s ease;
+        width: 100%;
       }
 
-      .btn-audio:hover {
-        box-shadow: 0px 0px 20px rgba(23, 162, 184, 1);
+      .audio-container audio {
+        width: 100%;
+        max-width: 300px;
+        border-radius: 10px;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
       }
 
-      /* Floating animation */
-      @keyframes floating {
-        0% {
-          transform: translateY(0px);
-        }
-        50% {
-          transform: translateY(-10px);
-        }
-        100% {
-          transform: translateY(0px);
-        }
+      .highlight {
+        background: #e0f7fa;
+        border-left: 5px solid #00796b;
+        padding-left: 10px;
+        margin-bottom: 0.5rem;
+        font-style: italic;
+        color: #00796b;
+      }
+
+      .source-language,
+      .translate-to {
+        font-weight: bold;
+        color: #00796b;
+      }
+
+      .snowfall {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
       }
     </style>
   </head>
-  {% extends 'layout.html' %} {% block content %}
   <body>
-    <div class="table-container">
-      <h3>Translations History</h3>
-      <table class="table table-bordered table-hover">
-        <thead>
-          <tr>
-            <th>Original Text</th>
-            <th>Language</th>
-            <th>Translated Text</th>
-            <th>Audio</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Add dynamic data here -->
-          <tr>
-            <td>Example Word</td>
-            <td>English</td>
-            <td>Exemple</td>
-            <td>
-              <button class="btn-audio">
-                <i class="fas fa-volume-up audio-icon"></i>
-              </button>
-            </td>
-          </tr>
-          <tr>
-            <td>Hola</td>
-            <td>Spanish</td>
-            <td>Hello</td>
-            <td>
-              <button class="btn-audio">
-                <i class="fas fa-volume-up audio-icon"></i>
-              </button>
-            </td>
-          </tr>
-          <!-- Add more rows as needed -->
-        </tbody>
-      </table>
-    </div>
+    <canvas class="snowfall" id="snowfall"></canvas>
 
-    <!-- FontAwesome and Bootstrap JS -->
-    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+    {% extends 'layout.html' %} {% block content %}
+    <div class="container">
+      <h1>{{ title }}</h1>
+
+      {% for translation in translations %}
+      <div class="translation-item">
+        <div class="translation-header">
+          <span class="source-language"
+            >Source: {{ translation['source_language'] }}</span
+          >
+        </div>
+        <div class="translation-header">
+          <span class="translate-to"
+            >Translate To: {{ translation['translate_to'] }}</span
+          >
+        </div>
+        <div class="translation-content highlight">
+          <strong>Original Text:</strong>
+          <p>{{ translation['original_text'] }}</p>
+        </div>
+        <div class="translation-content highlight">
+          <strong>Translated Text:</strong>
+          <p>{{ translation['translated_text'] }}</p>
+        </div>
+        <div class="audio-container">
+          <audio controls>
+            <source
+              src="{{ url_for('static', filename=translation['audio_file_path'].split('/static/')[1]) }}"
+              type="audio/mp4"
+            />
+            Your browser does not support the audio tag.
+          </audio>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endblock %}
+
+    <script>
+      const canvas = document.getElementById("snowfall");
+      const ctx = canvas.getContext("2d");
+
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const snowflakes = [];
+      const numSnowflakes = 200;
+
+      class Snowflake {
+        constructor(x, y) {
+          this.x = x;
+          this.y = y;
+          this.size = Math.random() * 5 + 2;
+          this.speed = Math.random() * 1.5 + 0.5;
+          this.opacity = Math.random() * 0.5 + 0.3;
+        }
+
+        update() {
+          this.y += this.speed;
+          if (this.y > canvas.height) {
+            this.y = -this.size;
+            this.x = Math.random() * canvas.width;
+          }
+        }
+
+        draw() {
+          ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      for (let i = 0; i < numSnowflakes; i++) {
+        snowflakes.push(
+          new Snowflake(
+            Math.random() * canvas.width,
+            Math.random() * canvas.height
+          )
+        );
+      }
+
+      function animateSnowfall() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        snowflakes.forEach((snowflake) => {
+          snowflake.update();
+          snowflake.draw();
+        });
+        requestAnimationFrame(animateSnowfall);
+      }
+
+      animateSnowfall();
+    </script>
   </body>
 </html>
-{% endblock %}

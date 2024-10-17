@@ -6,7 +6,8 @@ from application.forms import QRCodeData
 from application import utils
 #voice
 import speech_recognition as sr
-
+#pymongo
+from application.mongo_config import mongo  # Import MongoDB đã được config
 # OCR
 import cv2
 import pytesseract
@@ -74,10 +75,11 @@ def upload():
   # Hàm xử lý sự kiện sau khi nhận diện giọng nói thành công
 @app.route("/decoded", methods=["POST", "GET"])
 def decoded():
-    print("Session data:", session)  # In ra session để kiểm tra nội dung
+    # print("Session data:", session)  # In session để kiểm tra
+
     sentence = session.get("sentence")
 
-    if sentence is None:
+    if sentence is None or sentence == "":
         return "No sentence found in session.", 400  # Trả về lỗi nếu không có dữ liệu
 
     lang, _ = utils.detect_language(sentence)
@@ -91,12 +93,26 @@ def decoded():
 
         # Thực hiện dịch văn bản
         translated_text = utils.translate_text(text_data, translate_to)
-        print(translated_text)
+        # print(translated_text)
 
         # Tạo file âm thanh từ kết quả dịch
         tts = gTTS(translated_text, lang=translate_to)
         file_location = os.path.join(app.config['AUDIO_FILE_UPLOAD'], generated_audio_filename)
         tts.save(file_location)
+
+      # Chuẩn bị dữ liệu để lưu vào MongoDB
+        translation_data = {
+            "original_text": sentence,  
+            "translated_text": translated_text, 
+            "source_language": lang,  
+            "translate_to": translate_to,  
+            "audio_file_path": file_location  
+        }
+
+        mongo.db.translate.insert_one(translation_data)
+
+        # Xóa dữ liệu trong session sau khi submit form
+        session["sentence"] = ""
 
         return render_template("decoded.html", 
                                form=form,
@@ -106,8 +122,8 @@ def decoded():
                                file=generated_audio_filename)
 
     else:
-        form.data_field.data = sentence
-        session["sentence"] = ""  # Xóa dữ liệu trong session sau khi sử dụng
+        form.data_field.data = sentence  # Đưa dữ liệu nhận diện vào trường input
+        # Không xóa session ở đây, chỉ làm khi người dùng submit form
 
         return render_template("decoded.html", 
                                form=form, 
@@ -171,4 +187,5 @@ def voice_upload():
 
 @app.route("/translate", methods=["GET", "POST"])
 def translate():
-    return render_template("translate.html", title="Translate")
+    translations = mongo.db.translate.find()
+    return render_template("translate.html", title="Translate History", translations=translations)

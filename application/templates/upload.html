@@ -3,246 +3,220 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Enhanced Animated Upload Interface</title>
+    <title>{{ title }}</title>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
     />
     <style>
-      /* Canvas Background Style */
+      body {
+        font-family: "Roboto", sans-serif;
+        background-color: #f0f2f5;
+        position: relative;
+        overflow-x: hidden;
+        min-height: 100vh;
+        margin: 0;
+      }
+
       canvas {
-        position: absolute;
+        position: fixed;
         top: 0;
         left: 0;
-        z-index: 0;
+        z-index: -1;
         pointer-events: none;
-        opacity: 0.6;
+        display: block;
+        width: 100vw;
+        height: 100vh;
       }
 
       .container {
-        z-index: 1;
-        width: 80%;
-        max-width: 600px;
-        background-color: rgba(255, 255, 255, 0.95);
-        border-radius: 12px;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-        padding: 30px;
-        text-align: center;
-        opacity: 0;
-        transform: translateY(50px);
-        animation: fadeInUp 1s ease-out forwards;
-      }
-
-      @keyframes fadeInUp {
-        0% {
-          opacity: 0;
-          transform: translateY(50px);
-        }
-        100% {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      h4 {
-        color: #333;
-        margin: 0 0 20px;
-        font-size: 26px;
-        font-weight: 600;
-        animation: fadeIn 1s ease-in-out 0.5s forwards;
-        opacity: 0;
-      }
-
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-        }
-        to {
-          opacity: 1;
-        }
-      }
-
-      /* Dropzone Style */
-      #myDropzone {
-        border: 2px dashed #4caf50;
-        border-radius: 12px;
-        padding: 60px;
-        background: linear-gradient(135deg, #f1f1f1, #e2f9e1);
-        transition: background-color 0.3s, transform 0.3s;
         position: relative;
-        margin-bottom: 20px;
-        opacity: 0;
-        animation: fadeInScale 1s ease-in-out 0.7s forwards;
-        transform: scale(0.9);
+        padding: 2rem;
+        max-width: 1200px;
+        margin: auto;
       }
 
-      @keyframes fadeInScale {
-        from {
-          opacity: 0;
-          transform: scale(0.9);
-        }
-        to {
-          opacity: 1;
-          transform: scale(1);
-        }
-      }
-
-      #myDropzone:hover {
-        background: linear-gradient(135deg, #c2f0c2, #d4ffd9);
-        transform: scale(1.02);
-      }
-
-      .upload-icon {
-        font-size: 60px;
-        color: #4caf50;
-        animation: bounce 1s infinite alternate;
-      }
-
-      @keyframes bounce {
-        from {
-          transform: translateY(0);
-        }
-        to {
-          transform: translateY(-12px);
-        }
-      }
-
-      /* Button Style */
-      .btn-upload {
-        background: linear-gradient(135deg, #007bff, #00d4ff);
-        border: none;
-        color: white;
-        padding: 12px 25px;
-        border-radius: 30px;
-        font-size: 18px;
-        cursor: pointer;
-        transition: transform 0.3s, box-shadow 0.3s;
-        opacity: 0;
-        animation: fadeInUp 1s ease-in-out 1.2s forwards;
-      }
-
-      .btn-upload:hover {
-        transform: scale(1.1);
-        box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
-      }
-
-      /* Footer */
-      .footer {
+      h1 {
         text-align: center;
-        margin-top: 20px;
-        font-size: 14px;
-        color: #666;
-        animation: fadeIn 1.5s ease-in-out 1.5s forwards;
-        opacity: 0;
+        margin-bottom: 2rem;
+        color: #343a40;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
       }
 
-      /* Responsive Adjustments */
-      @media (max-width: 768px) {
-        .container {
-          width: 90%;
-          padding: 20px;
-        }
-
-        .upload-icon {
-          font-size: 50px;
-        }
+      .translation-row {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1.5rem;
       }
 
-      @media (max-width: 480px) {
-        .container {
-          width: 100%;
-          padding: 15px;
-        }
+      .translation-item {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        flex: 1;
+        min-width: 300px;
+        margin-bottom: 1.5rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
 
-        .upload-icon {
-          font-size: 40px;
-        }
+      .translation-item:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+      }
 
-        .btn-upload {
-          font-size: 16px;
-        }
+      .translation-header {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #00796b;
+        margin-bottom: 1rem;
+        text-align: center;
+      }
+
+      .translation-content {
+        font-size: 1rem;
+        color: #555;
+        margin-bottom: 1rem;
+        text-align: center;
+      }
+
+      .audio-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+      }
+
+      .audio-container audio {
+        width: 100%;
+        max-width: 300px;
+        border-radius: 10px;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      .highlight {
+        background: #e0f7fa;
+        border-left: 5px solid #00796b;
+        padding-left: 10px;
+        margin-bottom: 0.5rem;
+        font-style: italic;
+        color: #00796b;
+      }
+
+      .source-language {
+        font-weight: bold;
+        color: #00796b;
+      }
+
+      .translate-to {
+        font-weight: bold;
+        color: #00796b;
+      }
+
+      .snowfall {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
       }
     </style>
   </head>
   <body>
-    <canvas id="canvasBackground"></canvas>
-    {% extends "layout.html" %} {% block content %}
+    <canvas class="snowfall" id="snowfall"></canvas>
+
+    {% extends 'layout.html' %} {% block content %}
     <div class="container">
-      <h4>Upload Your Image to Get Translation</h4>
-      <div id="myDropzone">
-        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+      <h1>{{ title }}</h1>
+
+      <div class="translation-row">
+        {% for translation in translations %}
+        <div class="translation-item">
+          <div class="translation-header">
+            <span class="source-language"
+              >Source: {{ translation['source_language'] }}</span
+            >
+          </div>
+          <div class="translation-content highlight">
+            <strong>Original Text:</strong>
+            <p>{{ translation['original_text'] }}</p>
+          </div>
+          <div class="translation-content highlight">
+            <strong>Translated Text:</strong>
+            <p>{{ translation['translated_text'] }}</p>
+          </div>
+          <div class="audio-container">
+            <audio controls>
+              <source
+                src="{{ url_for('static', filename=translation['audio_file_path'].split('/static/')[1]) }}"
+                type="audio/mp4"
+              />
+              Your browser does not support the audio tag.
+            </audio>
+          </div>
+        </div>
+        {% endfor %}
       </div>
-      <!-- Dropzone -->
-      {{ dropzone.create(action='upload') }} {{ dropzone.load_js() }} {{
-      dropzone.config() }}
     </div>
-    <div class="footer">Drag and drop your image or click to select a file</div>
     {% endblock %}
 
     <script>
-      // Canvas Background Animation
-      const canvas = document.getElementById("canvasBackground");
+      const canvas = document.getElementById("snowfall");
       const ctx = canvas.getContext("2d");
 
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
 
-      const particlesArray = [];
+      const snowflakes = [];
+      const numSnowflakes = 200;
 
-      class Particle {
-        constructor() {
-          this.x = Math.random() * canvas.width;
-          this.y = Math.random() * canvas.height;
-          this.size = Math.random() * 5 + 1;
-          this.speedX = Math.random() * 3 - 1.5;
-          this.speedY = Math.random() * 3 - 1.5;
-          this.color = "rgba(0, 123, 255, 0.6)";
+      class Snowflake {
+        constructor(x, y) {
+          this.x = x;
+          this.y = y;
+          this.size = Math.random() * 5 + 2;
+          this.speed = Math.random() * 1.5 + 0.5;
+          this.opacity = Math.random() * 0.5 + 0.3;
         }
+
         update() {
-          this.x += this.speedX;
-          this.y += this.speedY;
-
-          // Bounce particles off the edges
-          if (this.size > 0.2) this.size -= 0.1;
-          if (this.x > canvas.width || this.x < 0) this.speedX = -this.speedX;
-          if (this.y > canvas.height || this.y < 0) this.speedY = -this.speedY;
+          this.y += this.speed;
+          if (this.y > canvas.height) {
+            this.y = -this.size;
+            this.x = Math.random() * canvas.width;
+          }
         }
+
         draw() {
-          ctx.fillStyle = this.color;
+          ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
           ctx.beginPath();
           ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-          ctx.closePath();
           ctx.fill();
         }
       }
 
-      function init() {
-        for (let i = 0; i < 150; i++) {
-          particlesArray.push(new Particle());
-        }
+      for (let i = 0; i < numSnowflakes; i++) {
+        snowflakes.push(
+          new Snowflake(
+            Math.random() * canvas.width,
+            Math.random() * canvas.height
+          )
+        );
       }
 
-      function handleParticles() {
-        for (let i = 0; i < particlesArray.length; i++) {
-          particlesArray[i].update();
-          particlesArray[i].draw();
-        }
-      }
-
-      function animate() {
+      function animateSnowfall() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        handleParticles();
-        requestAnimationFrame(animate);
+        snowflakes.forEach((snowflake) => {
+          snowflake.update();
+          snowflake.draw();
+        });
+        requestAnimationFrame(animateSnowfall);
       }
 
-      init();
-      animate();
-
-      // Resize canvas on window resize
-      window.addEventListener("resize", function () {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-      });
+      animateSnowfall();
     </script>
   </body>
 </html>
