@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Translation App - Snow Effect</title>
+    <style>
+      /* Nền toàn bộ */
+      body {
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(135deg, #74ebd5, #acb6e5);
+        font-family: "Poppins", sans-serif;
+        overflow: hidden;
+      }
+
+      /* Canvas dành cho hoa tuyết bay */
+      canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+      }
+
+      /* Thẻ card chính */
+      .card-style {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        padding: 20px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      .card-style:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+      }
+
+      /* Các trường input */
+      .form-control,
+      .custom-select {
+        border: none;
+        border-radius: 5px;
+        padding: 15px;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        transition: box-shadow 0.2s ease;
+      }
+      .form-control:focus,
+      .custom-select:focus {
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        outline: none;
+      }
+
+      /* Nút translate */
+      .btn-outline-info {
+        background-color: #36d1dc;
+        background-image: linear-gradient(to right, #5b86e5, #36d1dc);
+        border: none;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 30px;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        transition: background 0.3s ease, transform 0.2s ease;
+      }
+      .btn-outline-info:hover {
+        background-image: linear-gradient(to right, #36d1dc, #5b86e5);
+        transform: translateY(-2px);
+      }
+
+      /* Textarea hiển thị kết quả */
+      .result-box {
+        background-color: #f4f7fa;
+        border: none;
+        padding: 15px;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 5px;
+        resize: none;
+        font-size: 16px;
+        color: #333;
+      }
+
+      /* Phần history */
+      .history-button {
+        color: #36d1dc;
+        cursor: pointer;
+        transition: color 0.2s ease;
+      }
+      .history-button:hover {
+        color: #5b86e5;
+      }
+
+      /* Audio */
+      audio {
+        width: 100%;
+        outline: none;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    {% extends 'layout.html' %} {% block content %}
+    <div class="mt-4">
+      <div class="card card-style mb-4">
+        <div class="card-body justify-content-center">
+          <h3 class="text-center mb-4">Translate and Generate QRCode</h3>
+          <p>Language detected: <strong>{{ lang }}</strong></p>
+          <form action="" method="POST">
+            {{ form.csrf_token() }}
+            <fieldset class="form-group">
+              <!-- Trường nhập liệu -->
+              <div class="form-group mb-4">
+                {{ form.data_field.label(class="form-control-label") }} {% if
+                form.data_field.errors %} {{ form.data_field(class="form-control
+                form-control-sm is-invalid") }} {% for error in
+                form.data_field.errors %}
+                <div class="invalid-feedback">
+                  <span>{{ error }}</span>
+                </div>
+                {% endfor %} {% else %} {{ form.data_field(class="form-control
+                form-control-sm") }} {% endif %}
+              </div>
+
+              <!-- Trường chọn ngôn ngữ -->
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <label class="input-group-text" for="inputGroupSelect01"
+                    >{{ form.language.label }}</label
+                  >
+                </div>
+                {{ form.language(class="custom-select") }}
+              </div>
+
+              <!-- Nút submit -->
+              <div class="form-group">
+                {{ form.submit(class="btn btn-outline-info btn-block") }}
+              </div>
+            </fieldset>
+          </form>
+
+          <!-- Kết quả dịch -->
+          {% if translated_text %}
+          <div class="form-group mb-4">
+            <textarea
+              id="translateField"
+              class="form-control result-box"
+              readonly
+            >
+{{ translated_text }}</textarea
+            >
+          </div>
+          {% endif %}
+
+          <!-- Nút xem lịch sử dịch -->
+          <div class="history-button mt-3 text-center">
+            <i class="fas fa-history"></i> View Translation History
+          </div>
+
+          <!-- Trình phát âm thanh -->
+          {% if audio %}
+          <div class="d-flex justify-content-center mt-4">
+            <audio controls autoplay class="m-auto">
+              <source src="horse.ogg" type="audio/ogg" />
+              <source
+                src="{{ url_for('static', filename='audio_files/' + file) }}"
+                type="audio/mpeg"
+              />
+              Your browser does not support the audio element.
+            </audio>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endblock %}
+    <!-- Canvas cho hiệu ứng hoa tuyết -->
+    <canvas id="snowCanvas"></canvas>
+
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+    <script>
+      document.getElementById("submit").addEventListener("click", function () {
+        swal({
+          title: "File upload in process",
+          text: "Please wait... this can take sometime",
+          icon: "success",
+          button: "Okay",
+        });
+      });
+
+      // Script cho hiệu ứng hoa tuyết bằng canvas
+      const canvas = document.getElementById("snowCanvas");
+      const ctx = canvas.getContext("2d");
+
+      let particlesArray = [];
+      let numberOfParticles = 100;
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      window.addEventListener("resize", function () {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      });
+
+      class Particle {
+        constructor() {
+          this.x = Math.random() * canvas.width;
+          this.y = Math.random() * canvas.height;
+          this.size = Math.random() * 5 + 1;
+          this.speedX = Math.random() * 3 - 1.5;
+          this.speedY = Math.random() * 2 + 1;
+        }
+
+        update() {
+          this.x += this.speedX;
+          this.y += this.speedY;
+
+          if (this.size > 0.2) this.size -= 0.1;
+
+          if (this.y > canvas.height) {
+            this.y = 0 - this.size;
+            this.x = Math.random() * canvas.width;
+            this.size = Math.random() * 5 + 1;
+            this.speedX = Math.random() * 3 - 1.5;
+            this.speedY = Math.random() * 2 + 1;
+          }
+        }
+
+        draw() {
+          ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      function init() {
+        particlesArray = [];
+        for (let i = 0; i < numberOfParticles; i++) {
+          particlesArray.push(new Particle());
+        }
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < particlesArray.length; i++) {
+          particlesArray[i].update();
+          particlesArray[i].draw();
+        }
+        requestAnimationFrame(animate);
+      }
+
+      init();
+      animate();
+    </script>
+  </body>
+</html>
