@@ -3,11 +3,37 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>{{ title }}</title>
+    <script>
+      function startListening() {
+        // Cập nhật trạng thái khi bắt đầu nhận diện giọng nói
+        document.getElementById("status").textContent = "Đang nghe bạn nói...";
+        document.getElementById("status").style.color = "green"; // Đổi màu chữ thành xanh
+      }
+    </script>
   </head>
   <body>
     {% extends "layout.html" %} {% block content %}
-    <div>Uplooad voice</div>
+    <div class="container">
+      <h1>{{ title }}</h1>
+      <form action="/voice_upload" method="POST">
+        <div class="form-group">
+          <p>
+            Nhấn nút dưới đây để bắt đầu nhận diện giọng nói (lưu ý cho phép sử
+            dụng microphone)
+          </p>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            onclick="startListening()"
+          >
+            Bắt đầu nhận diện giọng nói
+          </button>
+        </div>
+      </form>
+      <!-- Hiển thị trạng thái khi nhận diện giọng nói -->
+      <p id="status"></p>
+    </div>
     {% endblock %}
   </body>
 </html>

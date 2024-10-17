@@ -65,7 +65,7 @@ which tesseract
 
 ## 5. **Cấu Hình Flask Secret Key**
 
-Ứng dụng Flask của bạn sử dụng một `SECRET_KEY` để bảo vệ session và cookie. Để tạo một `SECRET_KEY` mới, bạn có thể sử dụng Python như sau trong terminal:
+Ứng dụng Flask của bạn sử dụng một `SECRET_KEY` để bảo vệ session và cookie. Để tạo một `SECRET_KEY` mới, bạn có thể sử dụng Python như sau:
 
 ```python
 import secrets
