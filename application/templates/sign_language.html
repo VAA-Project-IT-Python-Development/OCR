@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nhận diện Ngôn ngữ Ký hiệu</title>
+    {% extends 'layout.html' %} {% block content %}
+
+    <style>
+      .container {
+        margin-top: 20px;
+        text-align: center;
+        padding: 20px;
+        border-radius: 10px;
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .video-container {
+        margin-bottom: 20px;
+      }
+
+      #video-feed {
+        width: 800px;
+        height: auto;
+        border: 2px solid #333;
+        border-radius: 5px;
+      }
+
+      .button-container {
+        margin-top: 20px;
+      }
+
+      .btn {
+        padding: 10px 20px;
+        font-size: 18px;
+        color: #fff;
+        background-color: #007bff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .btn:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Nhận diện Ngôn ngữ Ký hiệu</h1>
+      <div class="video-container">
+        <img
+          src="{{ url_for('video_feed') }}"
+          id="video-feed"
+          alt="Webcam feed"
+        />
+      </div>
+    </div>
+  </body>
+</html>
+{% endblock %}
